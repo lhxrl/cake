@@ -14,16 +14,25 @@ const canvas = document.getElementById("gestureCanvas");
 const ctx = canvas.getContext("2d");
 
 const IMAGE_FILES = [
-  "photo1.JPG",
-  "photo2.JPG",
-  "photo3.JPG",
-  "photo4.JPG",
-  "photo5.JPG",
-  "photo6.JPG",
-  "photo7.JPG",
-  "photo8.JPG",
-  "photo9.JPG",
-  "photo10.JPG",
+  // Replace or extend this list with new photos placed in ./images.
+  "photo1.jpg",
+  "photo2.jpg",
+  "photo3.jpg",
+  "photo4.jpg",
+  "photo5.jpg",
+  "photo6.jpg",
+  "photo7.jpg",
+  "photo8.jpg",
+  "photo9.jpg",
+  "photo10.jpg",
+  "photo11.jpg",
+  "photo12.jpg",
+  "photo13.jpg",
+  "photo14.jpg",
+  "photo15.jpg",
+  "photo16.jpg",
+  "photo17.jpg",
+  "photo18.jpg",
 ];
 
 const MESSAGE_TEXT = "生日快樂\n我的同姓同星座姐妹🎂";
@@ -116,6 +125,87 @@ function createPhotoParticles() {
   const total = IMAGE_FILES.length;
   const centerX = 0;
   const centerY = 0;
+  const placedRects = [];
+  const isMobile = window.innerWidth <= 720;
+  const photoWidth = isMobile ? 88 : 118;
+  const photoHeight = isMobile ? 110 : 148;
+  const spreadX = window.innerWidth * 0.45;
+  const spreadY = window.innerHeight * 0.35;
+  const centerAvoidX = isMobile ? 210 : 290;
+  const centerAvoidY = isMobile ? 180 : 240;
+  const screenPaddingX = isMobile ? 18 : 28;
+  const screenPaddingY = isMobile ? 22 : 30;
+
+  function overlaps(rectA, rectB, gap = 16) {
+    return !(
+      rectA.right + gap < rectB.left ||
+      rectA.left - gap > rectB.right ||
+      rectA.bottom + gap < rectB.top ||
+      rectA.top - gap > rectB.bottom
+    );
+  }
+
+  function buildPhotoTarget(index) {
+    for (let attempt = 0; attempt < 160; attempt += 1) {
+      let x = (Math.random() - 0.5) * spreadX * 2;
+      let y = (Math.random() - 0.5) * spreadY * 2;
+
+      y = Math.max(-spreadY, Math.min(spreadY, y));
+
+      if (Math.abs(x) < centerAvoidX && Math.abs(y) < centerAvoidY) {
+        x += (x > 0 ? 1 : -1) * centerAvoidX;
+        y += (y > 0 ? 1 : -1) * centerAvoidY;
+      }
+
+      const minX = -window.innerWidth / 2 + photoWidth / 2 + screenPaddingX;
+      const maxX = window.innerWidth / 2 - photoWidth / 2 - screenPaddingX;
+      const minY = -window.innerHeight / 2 + photoHeight / 2 + screenPaddingY;
+      const maxY = window.innerHeight / 2 - photoHeight / 2 - screenPaddingY;
+      x = clamp(x, minX, maxX);
+      y = clamp(y, minY, maxY);
+
+      const rect = {
+        left: x - photoWidth / 2,
+        right: x + photoWidth / 2,
+        top: y - photoHeight / 2,
+        bottom: y + photoHeight / 2,
+      };
+
+      if (placedRects.some((placed) => overlaps(rect, placed, 18))) {
+        continue;
+      }
+
+      placedRects.push(rect);
+      return {
+        x,
+        y,
+        rotation: -14 + Math.random() * 28,
+        scale: 0.9 + Math.random() * 0.08,
+        depth: -10 + Math.random() * 24,
+        delay: Math.min(index * 0.015, 0.12),
+      };
+    }
+
+    const fallbackAngle = (Math.PI * 2 * index) / total;
+    const fallbackX = clamp(
+      Math.cos(fallbackAngle) * spreadX * 0.88,
+      -window.innerWidth / 2 + photoWidth / 2 + screenPaddingX,
+      window.innerWidth / 2 - photoWidth / 2 - screenPaddingX
+    );
+    const fallbackY = clamp(
+      Math.sin(fallbackAngle) * spreadY * 0.82,
+      -window.innerHeight / 2 + photoHeight / 2 + screenPaddingY,
+      window.innerHeight / 2 - photoHeight / 2 - screenPaddingY
+    );
+    return {
+      x: fallbackX,
+      y: fallbackY,
+      rotation: -8 + Math.random() * 16,
+      scale: 0.92,
+      depth: 0,
+      delay: Math.min(index * 0.015, 0.12),
+    };
+  }
 
   IMAGE_FILES.forEach((fileName, index) => {
     const img = new Image();
@@ -131,24 +221,18 @@ function createPhotoParticles() {
     wrapper.appendChild(img);
     photoContainer.appendChild(wrapper);
 
-    const angle = (Math.PI * 2 * index) / total + (Math.random() - 0.5) * 0.14;
-    const ring = 280 + Math.floor(index / 5) * 132 + (index % 5) * 12;
-    const x = Math.cos(angle) * ring;
-    const y = Math.sin(angle) * ring * 0.7;
-    const rotation = -18 + Math.random() * 36;
-    const scale = 0.88 + Math.random() * 0.16;
-    const depth = -20 + Math.random() * 60;
+    const target = buildPhotoTarget(index);
 
     photoParticles.push({
       element: wrapper,
       x: centerX,
       y: centerY,
-      targetX: x,
-      targetY: y,
-      rotation,
-      scale,
-      depth,
-      delay: Math.min(index * 0.02, 0.16),
+      targetX: target.x,
+      targetY: target.y,
+      rotation: target.rotation,
+      scale: target.scale,
+      depth: target.depth,
+      delay: target.delay,
     });
   });
 }
@@ -335,6 +419,7 @@ function resetTypewriter() {
 }
 
 function enterExplosionState() {
+  createPhotoParticles();
   state = "explosion";
   targetExplosionProgress = 1;
   resetTypewriter();
@@ -486,6 +571,9 @@ async function init() {
   createPhotoParticles();
   createBurstParticles();
   paperSignature.classList.remove("visible");
+  window.addEventListener("resize", () => {
+    createPhotoParticles();
+  });
   await initCamera();
   introStartTime = performance.now();
   lastFrameTime = performance.now();

@@ -126,7 +126,7 @@ body {
 .burst-particle {
   position: absolute;
   will-change: transform, opacity, filter;
-  opacity: 1;
+  opacity: 0;
   transform-origin: center;
 }
 
@@ -356,18 +356,18 @@ body {
   top: 50%;
   transform: translate(-50%, -50%) scale(0.9);
   margin: 0;
-  font-family: "Baloo 2", sans-serif;
-  font-size: clamp(2.6rem, 7vw, 5.6rem);
-  color: #e88d68;
+  font-family: "Moon Dance", "Baloo 2", cursive;
+  font-size: clamp(3.8rem, 9.8vw, 7.8rem);
+  color: #e77471;
   text-shadow:
-    0 8px 20px rgba(232, 141, 104, 0.22),
-    0 0 14px rgba(255, 236, 208, 0.28);
-  letter-spacing: 0.08em;
-  line-height: 0.92;
+    0 8px 20px rgba(231, 116, 113, 0.24),
+    0 0 14px rgba(255, 232, 226, 0.36);
+  letter-spacing: 0.02em;
+  line-height: 1.08;
   opacity: 0;
   z-index: 8;
-  text-align: center;
   will-change: transform, opacity;
+  text-align: center;
 }
 
 .typewriter-stage {
@@ -404,7 +404,9 @@ body {
 .typed-message {
   margin: 0;
   min-height: 7.5rem;
-  font-family: "Baloo 2", "Noto Sans TC", sans-serif;
+  font-family: "Noto Serif TC", "Noto Sans TC", serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   font-size: clamp(1.45rem, 4vw, 2.3rem);
   line-height: 1.5;
   color: #7a604e;
@@ -425,9 +427,10 @@ body {
 .paper-signature {
   position: absolute;
   right: 1.3rem;
-  bottom: 1rem;
+  bottom: 0.45rem;
   text-align: right;
-  font-family: "Baloo 2", "Noto Sans TC", sans-serif;
+  font-family: "Noto Serif TC", "Noto Sans TC", serif;
+  font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.25;
   color: rgba(95, 82, 71, 0.72);
@@ -492,6 +495,7 @@ body {
     white-space: normal;
     text-align: center;
     width: calc(100vw - 2rem);
+    font-size: clamp(2.9rem, 13vw, 5rem);
   }
 
   .typewriter-stage {
