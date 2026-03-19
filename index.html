@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday Jenny</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <div class="bg-glow bg-glow-left"></div>
+      <div class="bg-glow bg-glow-right"></div>
+
+      <section class="scene" id="scene">
+        <div class="instruction-card">
+          <p>✋ Open palm: show memories</p>
+          <p>✊ Close fist: show message</p>
+        </div>
+
+        <div class="camera-hidden" aria-hidden="true">
+          <video id="webcam" autoplay muted playsinline></video>
+          <canvas id="gestureCanvas"></canvas>
+        </div>
+
+        <div class="decor-layer" id="decorLayer">
+          <div class="decor-stars" id="decorStars"></div>
+        </div>
+
+        <div class="intro-stage" id="introStage">
+          <div class="push-group" id="dogCakeGroup">
+            <img
+              id="dogImage"
+              class="dog-image"
+              src="./images/dog1.png"
+              alt="Cute dog pushing a birthday cake"
+            />
+
+            <div class="cake-stage" id="cakeStage">
+              <div class="cake" id="cake">
+                <div class="cake-shadow"></div>
+                <div class="cake-plate"></div>
+                <div class="cake-tier cake-tier-bottom"></div>
+                <div class="cake-tier cake-tier-middle"></div>
+                <div class="cake-tier cake-tier-top"></div>
+                <div class="cake-icing cake-icing-bottom"></div>
+                <div class="cake-icing cake-icing-middle"></div>
+                <div class="cake-icing cake-icing-top"></div>
+                <div class="cake-candle"></div>
+                <div class="cake-flame"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="explosion-stage" id="explosionStage">
+          <!-- Add or remove photos inside ./images; script.js loads them automatically. -->
+          <div class="photo-container" id="photoContainer"></div>
+          <div class="burst-particles" id="burstParticles"></div>
+          <h1 class="birthday-title" id="birthdayTitle">HAPPY<br />BIRTHDAY<br />JENNY</h1>
+        </div>
+
+        <div class="typewriter-stage" id="typewriterStage">
+          <div class="paper-card" id="paperCard">
+            <div class="paper-top"></div>
+            <div class="paper-body">
+              <!-- Change the message text in script.js if needed. -->
+              <p class="typed-message" id="typedMessage"></p>
+              <div class="paper-signature" id="paperSignature">
+                <div>By Lillian Hsu</div>
+                <div>2026.03.21</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,500 @@
+:root {
+  --bg: #f7f1e8;
+  --bg-soft: #fffaf4;
+  --ink: #5f5247;
+  --ink-soft: #8b7a6d;
+  --peach: #f7ceb5;
+  --cream: #fff4e6;
+  --mint: #dbe9d7;
+  --blue: #d9e7f2;
+  --pink: #f6c3d6;
+  --orange: #f6d4a2;
+  --shadow: 0 24px 60px rgba(139, 117, 95, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  overflow: hidden;
+  font-family: "Noto Sans TC", "Baloo 2", sans-serif;
+  color: var(--ink);
+  background:
+    linear-gradient(rgba(247, 241, 232, 0.72), rgba(247, 241, 232, 0.72)),
+    url("./images/bg.png") center center / cover no-repeat;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.bg-glow {
+  position: absolute;
+  width: 36rem;
+  height: 36rem;
+  border-radius: 50%;
+  filter: blur(44px);
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.bg-glow-left {
+  top: -12rem;
+  left: -10rem;
+  background: radial-gradient(circle, rgba(245, 220, 191, 0.75), transparent 66%);
+}
+
+.bg-glow-right {
+  right: -12rem;
+  bottom: -14rem;
+  background: radial-gradient(circle, rgba(234, 218, 198, 0.82), transparent 66%);
+}
+
+.scene {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  perspective: 1400px;
+  background: linear-gradient(rgba(247, 241, 232, 0.28), rgba(247, 241, 232, 0.28));
+}
+
+.instruction-card {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  z-index: 10;
+  padding: 0.7rem 0.9rem;
+  border-radius: 16px;
+  background: rgba(255, 252, 246, 0.72);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 28px rgba(139, 117, 95, 0.1);
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.instruction-card p {
+  margin: 0;
+}
+
+.camera-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.camera-hidden video,
+.camera-hidden canvas {
+  width: 1px;
+  height: 1px;
+}
+
+.decor-layer,
+.intro-stage,
+.explosion-stage,
+.typewriter-stage {
+  position: absolute;
+  inset: 0;
+}
+
+.decor-layer {
+  z-index: 6;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.decor-stars,
+.burst-particles {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.decor-star,
+.burst-particle {
+  position: absolute;
+  will-change: transform, opacity, filter;
+  opacity: 1;
+  transform-origin: center;
+}
+
+.decor-star,
+.burst-particle.star {
+  width: var(--size, 22px);
+  height: var(--size, 22px);
+}
+
+.image-star::before,
+.image-star::after {
+  display: none;
+}
+
+.image-star img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(255, 225, 140, 0.72));
+}
+
+.decor-star::before,
+.decor-star::after,
+.burst-particle.star::before,
+.burst-particle.star::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(255, 222, 120, 1));
+  box-shadow: 0 0 24px rgba(255, 225, 140, 0.72);
+}
+
+.decor-star::before,
+.burst-particle.star::before {
+  width: 24%;
+  height: 100%;
+}
+
+.decor-star::after,
+.burst-particle.star::after {
+  width: 100%;
+  height: 24%;
+}
+
+.intro-stage {
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.push-group {
+  position: relative;
+  width: min(600px, 78vw);
+  height: min(360px, 48vw);
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.dog-image {
+  position: absolute;
+  left: 8px;
+  bottom: 30px;
+  width: min(240px, 30vw);
+  height: auto;
+  z-index: 1;
+}
+
+.cake-stage {
+  position: absolute;
+  left: 262px;
+  bottom: 0;
+  width: min(24vw, 290px);
+  height: min(29vw, 340px);
+  will-change: transform, opacity;
+  z-index: 2;
+}
+
+.cake {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cake-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  width: 260px;
+  height: 34px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(145, 121, 97, 0.18);
+  filter: blur(10px);
+}
+
+.cake-plate {
+  position: absolute;
+  left: 50%;
+  bottom: 42px;
+  width: 250px;
+  height: 20px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff, #f6eadb);
+}
+
+.cake-tier {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 24px;
+  background: linear-gradient(180deg, var(--bg-soft), #f0c8a6);
+  border: 1px solid rgba(205, 170, 132, 0.28);
+}
+
+.cake-tier-bottom {
+  bottom: 54px;
+  width: 232px;
+  height: 100px;
+}
+
+.cake-tier-middle {
+  bottom: 136px;
+  width: 178px;
+  height: 82px;
+}
+
+.cake-tier-top {
+  bottom: 206px;
+  width: 130px;
+  height: 62px;
+}
+
+.cake-icing {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffdf9, #fff0dd);
+}
+
+.cake-icing-bottom {
+  bottom: 136px;
+  width: 232px;
+  height: 18px;
+}
+
+.cake-icing-middle {
+  bottom: 206px;
+  width: 178px;
+  height: 16px;
+}
+
+.cake-icing-top {
+  bottom: 258px;
+  width: 130px;
+  height: 14px;
+}
+
+.cake-candle {
+  position: absolute;
+  left: 50%;
+  bottom: 258px;
+  width: 14px;
+  height: 58px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: repeating-linear-gradient(135deg, #fff6f0 0 8px, #f7c78c 8px 16px);
+}
+
+.cake-flame {
+  position: absolute;
+  left: 50%;
+  bottom: 310px;
+  width: 24px;
+  height: 34px;
+  transform: translateX(-50%);
+  border-radius: 60% 60% 70% 70%;
+  background: radial-gradient(circle at 50% 35%, #fff7be 0 22%, #ffca74 56%, #ff9764 100%);
+  filter: drop-shadow(0 0 14px rgba(255, 185, 96, 0.44));
+  animation: flame-flicker 1.5s ease-in-out infinite;
+}
+
+.explosion-stage {
+  z-index: 5;
+  pointer-events: none;
+}
+
+.photo-container {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+}
+
+.photo-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(88px, 10vw, 130px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 7px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 18px 40px rgba(128, 111, 92, 0.18);
+  background: white;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.photo-particle img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.birthday-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  margin: 0;
+  font-family: "Baloo 2", sans-serif;
+  font-size: clamp(2.6rem, 7vw, 5.6rem);
+  color: #e88d68;
+  text-shadow:
+    0 8px 20px rgba(232, 141, 104, 0.22),
+    0 0 14px rgba(255, 236, 208, 0.28);
+  letter-spacing: 0.08em;
+  line-height: 0.92;
+  opacity: 0;
+  z-index: 8;
+  text-align: center;
+  will-change: transform, opacity;
+}
+
+.typewriter-stage {
+  z-index: 8;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 4rem;
+  pointer-events: none;
+}
+
+.paper-card {
+  width: min(520px, calc(100vw - 2rem));
+  min-height: 210px;
+  border-radius: 28px 28px 18px 18px;
+  background: linear-gradient(180deg, #fffdf9, #fbf4ea);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(214, 186, 156, 0.34);
+  opacity: 0;
+  transform: translateY(40px) scale(0.96);
+  will-change: transform, opacity;
+}
+
+.paper-top {
+  height: 18px;
+  border-radius: 28px 28px 0 0;
+  background: linear-gradient(90deg, #efc8a5, #f6dfbf);
+}
+
+.paper-body {
+  padding: 1.4rem 1.5rem 1.7rem;
+  position: relative;
+}
+
+.typed-message {
+  margin: 0;
+  min-height: 7.5rem;
+  font-family: "Baloo 2", "Noto Sans TC", sans-serif;
+  font-size: clamp(1.45rem, 4vw, 2.3rem);
+  line-height: 1.5;
+  color: #7a604e;
+  white-space: pre-wrap;
+}
+
+.typed-message::after {
+  content: "";
+  display: inline-block;
+  width: 0.12em;
+  height: 1em;
+  margin-left: 0.12em;
+  background: currentColor;
+  vertical-align: -0.08em;
+  animation: blink 1s steps(1) infinite;
+}
+
+.paper-signature {
+  position: absolute;
+  right: 1.3rem;
+  bottom: 1rem;
+  text-align: right;
+  font-family: "Baloo 2", "Noto Sans TC", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  color: rgba(95, 82, 71, 0.72);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 700ms ease, transform 700ms ease;
+}
+
+.paper-signature.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes cake-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1) rotate(-3deg);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.08) rotate(3deg);
+  }
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .dog-cake-group {
+    width: min(92vw, 560px);
+    height: 360px;
+  }
+
+  .dog-image {
+    width: 180px;
+  }
+
+  .cake-stage {
+    width: 280px;
+    height: 340px;
+  }
+
+  .birthday-title {
+    top: 14%;
+    white-space: normal;
+    text-align: center;
+    width: calc(100vw - 2rem);
+  }
+
+  .typewriter-stage {
+    padding-bottom: 1.8rem;
+  }
+}
