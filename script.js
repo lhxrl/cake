@@ -33,6 +33,9 @@ const IMAGE_FILES = [
   "photo16.jpg",
   "photo17.jpg",
   "photo18.jpg",
+  "photo19.jpg",
+  "photo20.jpg",
+  "photo21.jpg",
 ];
 
 const MESSAGE_TEXT = "生日快樂\n我的同姓同星座姐妹🎂";
