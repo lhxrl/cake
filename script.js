@@ -40,6 +40,7 @@ const IMAGE_FILES = [
 
 const MESSAGE_TEXT = "生日快樂\n我的同姓同星座姐妹🎂";
 const STAR_IMAGE = "images/star.png";
+const SONG_FILE = "song.mp3";
 const GESTURE_FRAMES = 5;
 const INTRO_BLANK_DURATION = 250;
 const INTRO_DURATION = 5000;
@@ -67,6 +68,10 @@ let sceneTargetY = 0;
 const photoParticles = [];
 const burstParticlePool = [];
 const decorParticles = [];
+const songAudio = new Audio(SONG_FILE);
+songAudio.preload = "auto";
+songAudio.loop = false;
+songAudio.playsInline = true;
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -91,34 +96,17 @@ function resizeCanvas() {
   canvas.height = video.videoHeight || 480;
 }
 
+function shuffleArray(items) {
+  for (let index = items.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
+  }
+  return items;
+}
+
 function createDecorativeParticles() {
   decorStars.innerHTML = "";
   decorParticles.length = 0;
-
-  for (let index = 0; index < 22; index += 1) {
-    const star = document.createElement("div");
-    star.className = "decor-star image-star";
-    star.style.setProperty("--size", `${18 + Math.random() * 24}px`);
-    const starImage = document.createElement("img");
-    starImage.src = STAR_IMAGE;
-    starImage.alt = "";
-    star.appendChild(starImage);
-    decorStars.appendChild(star);
-    decorParticles.push({
-      element: star,
-      kind: "star",
-      x: 6 + Math.random() * 88,
-      y: 6 + Math.random() * 82,
-      driftX: -16 + Math.random() * 32,
-      driftY: -14 + Math.random() * 28,
-      phase: Math.random() * Math.PI * 2,
-      speed: 0.16 + Math.random() * 0.28,
-      depth: -220 + Math.random() * 440,
-      blur: 0.3 + Math.random() * 1.2,
-      scale: 0.55 + Math.random() * 0.65,
-      opacity: 0.92 + Math.random() * 0.08,
-    });
-  }
 }
 
 function createPhotoParticles() {
@@ -128,87 +116,135 @@ function createPhotoParticles() {
   const total = IMAGE_FILES.length;
   const centerX = 0;
   const centerY = 0;
-  const placedRects = [];
   const isMobile = window.innerWidth <= 720;
   const photoWidth = isMobile ? 88 : 118;
   const photoHeight = isMobile ? 110 : 148;
-  const spreadX = window.innerWidth * 0.45;
-  const spreadY = window.innerHeight * 0.35;
-  const centerAvoidX = isMobile ? 210 : 290;
-  const centerAvoidY = isMobile ? 180 : 240;
-  const screenPaddingX = isMobile ? 18 : 28;
-  const screenPaddingY = isMobile ? 22 : 30;
+  const screenPaddingX = isMobile ? 16 : 28;
+  const screenPaddingY = isMobile ? 18 : 30;
 
-  function overlaps(rectA, rectB, gap = 16) {
-    return !(
-      rectA.right + gap < rectB.left ||
-      rectA.left - gap > rectB.right ||
-      rectA.bottom + gap < rectB.top ||
-      rectA.top - gap > rectB.bottom
-    );
-  }
-
-  function buildPhotoTarget(index) {
-    for (let attempt = 0; attempt < 160; attempt += 1) {
-      let x = (Math.random() - 0.5) * spreadX * 2;
-      let y = (Math.random() - 0.5) * spreadY * 2;
-
-      y = Math.max(-spreadY, Math.min(spreadY, y));
-
-      if (Math.abs(x) < centerAvoidX && Math.abs(y) < centerAvoidY) {
-        x += (x > 0 ? 1 : -1) * centerAvoidX;
-        y += (y > 0 ? 1 : -1) * centerAvoidY;
-      }
-
-      const minX = -window.innerWidth / 2 + photoWidth / 2 + screenPaddingX;
-      const maxX = window.innerWidth / 2 - photoWidth / 2 - screenPaddingX;
-      const minY = -window.innerHeight / 2 + photoHeight / 2 + screenPaddingY;
-      const maxY = window.innerHeight / 2 - photoHeight / 2 - screenPaddingY;
-      x = clamp(x, minX, maxX);
-      y = clamp(y, minY, maxY);
-
-      const rect = {
-        left: x - photoWidth / 2,
-        right: x + photoWidth / 2,
-        top: y - photoHeight / 2,
-        bottom: y + photoHeight / 2,
-      };
-
-      if (placedRects.some((placed) => overlaps(rect, placed, 18))) {
-        continue;
-      }
-
-      placedRects.push(rect);
-      return {
-        x,
-        y,
-        rotation: -14 + Math.random() * 28,
-        scale: 0.9 + Math.random() * 0.08,
-        depth: -10 + Math.random() * 24,
-        delay: Math.min(index * 0.015, 0.12),
-      };
+  function distributeLine(count, start, end) {
+    if (count <= 0) {
+      return [];
     }
 
-    const fallbackAngle = (Math.PI * 2 * index) / total;
-    const fallbackX = clamp(
-      Math.cos(fallbackAngle) * spreadX * 0.88,
-      -window.innerWidth / 2 + photoWidth / 2 + screenPaddingX,
-      window.innerWidth / 2 - photoWidth / 2 - screenPaddingX
-    );
-    const fallbackY = clamp(
-      Math.sin(fallbackAngle) * spreadY * 0.82,
-      -window.innerHeight / 2 + photoHeight / 2 + screenPaddingY,
-      window.innerHeight / 2 - photoHeight / 2 - screenPaddingY
-    );
-    return {
-      x: fallbackX,
-      y: fallbackY,
-      rotation: -8 + Math.random() * 16,
-      scale: 0.92,
-      depth: 0,
-      delay: Math.min(index * 0.015, 0.12),
-    };
+    if (count === 1) {
+      return [(start + end) / 2];
+    }
+
+    const values = [];
+    const step = (end - start) / (count - 1);
+    for (let index = 0; index < count; index += 1) {
+      values.push(start + step * index);
+    }
+    return values;
   }
+
+  function buildPhotoTargets() {
+    const minX = -window.innerWidth / 2 + photoWidth / 2 + screenPaddingX;
+    const maxX = window.innerWidth / 2 - photoWidth / 2 - screenPaddingX;
+    const minY = -window.innerHeight / 2 + photoHeight / 2 + screenPaddingY;
+    const maxY = window.innerHeight / 2 - photoHeight / 2 - screenPaddingY;
+    const liftY = isMobile ? 62 : 94;
+    const edgeInsetX = isMobile ? 10 : 16;
+    const edgeInsetY = isMobile ? 8 : 14;
+    const reservedTop = isMobile ? 118 : 132;
+    const topCount = Math.max(5, Math.ceil(total * 0.34));
+    const bottomCount = Math.max(5, Math.ceil(total * 0.34));
+    const sideCount = Math.max(0, total - topCount - bottomCount);
+    const leftCount = Math.ceil(sideCount / 2);
+    const rightCount = sideCount - leftCount;
+    const baseScale = total >= 21 ? (isMobile ? 0.86 : 0.9) : 0.94;
+    const targets = [];
+
+    distributeLine(
+      topCount,
+      minX + photoWidth * 0.18,
+      maxX - photoWidth * 0.18
+    ).forEach((x, index) => {
+      const jitterX = (Math.random() - 0.5) * (isMobile ? 16 : 26);
+      const jitterY = (Math.random() - 0.5) * (isMobile ? 8 : 14);
+      targets.push({
+        x: clamp(x + jitterX, minX, maxX),
+        y: clamp(
+          minY + reservedTop + edgeInsetY + (index % 2) * (isMobile ? 6 : 10) + jitterY - liftY,
+          minY,
+          maxY
+        ),
+        rotation: -15 + Math.random() * 22,
+        scale: baseScale + Math.random() * 0.04,
+        depth: -8 + Math.random() * 28,
+      });
+    });
+
+    distributeLine(
+      bottomCount,
+      minX + photoWidth * 0.18,
+      maxX - photoWidth * 0.18
+    ).forEach((x, index) => {
+      const jitterX = (Math.random() - 0.5) * (isMobile ? 18 : 28);
+      const jitterY = (Math.random() - 0.5) * (isMobile ? 10 : 16);
+      targets.push({
+        x: clamp(x + jitterX, minX, maxX),
+        y: clamp(
+          maxY - edgeInsetY - (index % 2) * (isMobile ? 8 : 12) + jitterY - liftY,
+          minY,
+          maxY
+        ),
+        rotation: -15 + Math.random() * 22,
+        scale: baseScale + Math.random() * 0.04,
+        depth: -8 + Math.random() * 28,
+      });
+    });
+
+    distributeLine(
+      leftCount,
+      minY + reservedTop + photoHeight * 1.05 - liftY,
+      maxY - photoHeight * 1.05 - liftY
+    ).forEach((y, index) => {
+      const jitterX = (Math.random() - 0.5) * (isMobile ? 10 : 18);
+      const jitterY = (Math.random() - 0.5) * (isMobile ? 18 : 28);
+      targets.push({
+        x: clamp(
+          minX + edgeInsetX + (index % 2) * (isMobile ? 10 : 14) + jitterX,
+          minX,
+          maxX
+        ),
+        y: clamp(y + jitterY, minY, maxY),
+        rotation: -16 + Math.random() * 14,
+        scale: baseScale + Math.random() * 0.03,
+        depth: -8 + Math.random() * 28,
+      });
+    });
+
+    distributeLine(
+      rightCount,
+      minY + reservedTop + photoHeight * 1.05 - liftY,
+      maxY - photoHeight * 1.05 - liftY
+    ).forEach((y, index) => {
+      const jitterX = (Math.random() - 0.5) * (isMobile ? 10 : 18);
+      const jitterY = (Math.random() - 0.5) * (isMobile ? 18 : 28);
+      targets.push({
+        x: clamp(
+          maxX - edgeInsetX - (index % 2) * (isMobile ? 10 : 14) + jitterX,
+          minX,
+          maxX
+        ),
+        y: clamp(y + jitterY, minY, maxY),
+        rotation: 2 + Math.random() * 16,
+        scale: baseScale + Math.random() * 0.03,
+        depth: -8 + Math.random() * 28,
+      });
+    });
+
+    shuffleArray(targets);
+
+    return targets.slice(0, total).map((target, index) => ({
+      ...target,
+      delay: Math.min(index * 0.012, 0.16),
+    }));
+  }
+
+  const photoTargets = buildPhotoTargets();
 
   IMAGE_FILES.forEach((fileName, index) => {
     const img = new Image();
@@ -224,7 +260,7 @@ function createPhotoParticles() {
     wrapper.appendChild(img);
     photoContainer.appendChild(wrapper);
 
-    const target = buildPhotoTarget(index);
+    const target = photoTargets[index];
 
     photoParticles.push({
       element: wrapper,
@@ -243,47 +279,66 @@ function createPhotoParticles() {
 function createBurstParticles() {
   burstParticles.innerHTML = "";
   burstParticlePool.length = 0;
+  const starCount = Math.max(24, photoParticles.length);
 
-  for (let index = 0; index < 18; index += 1) {
+  for (let index = 0; index < starCount; index += 1) {
     const star = document.createElement("div");
     star.className = "burst-particle star image-star";
-    star.style.setProperty("--size", `${14 + Math.random() * 18}px`);
+    star.style.setProperty("--size", `${24 + Math.random() * 24}px`);
     const starImage = document.createElement("img");
     starImage.src = STAR_IMAGE;
     starImage.alt = "";
     star.appendChild(starImage);
     burstParticles.appendChild(star);
-    const angle = (Math.PI * 2 * index) / 18 + (Math.random() - 0.5) * 0.28;
-    const radius = 90 + Math.random() * 70;
+    const anchor = photoParticles[index % Math.max(1, photoParticles.length)];
+    const anchorX = anchor ? anchor.targetX : 0;
+    const anchorY = anchor ? anchor.targetY : 0;
+    const jitterX = (Math.random() - 0.5) * 54;
+    const jitterY = (Math.random() - 0.5) * 54;
     burstParticlePool.push({
       element: star,
       kind: "star",
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius * 0.45 - 180,
-      scale: 0.65 + Math.random() * 0.55,
-      depth: -40 + Math.random() * 220,
-      blur: 0.3 + Math.random() * 1.2,
-      delay: Math.min(index * 0.016, 0.16),
+      x: anchorX + jitterX,
+      y: anchorY + jitterY,
+      scale: 0.8 + Math.random() * 0.8,
+      depth: -50 + Math.random() * 240,
+      blur: 0.2 + Math.random() * 0.9,
+      delay: Math.random() * 0.14,
     });
   }
 }
 
 function renderDecor(now) {
-  const decorVisible = state === "explosion" ? Math.max(0, explosionProgress) : 0;
+  const hiddenOpacity = now ? "0" : "0";
+  decorStars.style.opacity = hiddenOpacity;
+}
 
-  decorParticles.forEach((particle) => {
-    const drift = now * 0.001 * particle.speed + particle.phase;
-    const offsetX = Math.sin(drift) * particle.driftX + sceneCurrentX * 12;
-    const offsetY = Math.cos(drift * 0.92) * particle.driftY + sceneCurrentY * 10;
-    const depthScale = 1 + particle.depth / 900;
+async function unlockAudioContext() {
+  try {
+    songAudio.muted = true;
+    await songAudio.play();
+    songAudio.pause();
+    songAudio.currentTime = 0;
+    songAudio.muted = false;
+  } catch (error) {
+    return;
+  }
+}
 
-    particle.element.style.left = `${particle.x}%`;
-    particle.element.style.top = `${particle.y}%`;
-    particle.element.style.opacity = `${particle.opacity * decorVisible}`;
-    particle.element.style.filter = `blur(${particle.blur}px) drop-shadow(0 0 20px rgba(255,232,164,0.6))`;
-    particle.element.style.transform =
-      `translate3d(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px), ${particle.depth}px) scale(${depthScale * particle.scale})`;
-  });
+function stopBirthdaySong() {
+  songAudio.pause();
+  songAudio.currentTime = 0;
+}
+
+async function playBirthdaySong() {
+  stopBirthdaySong();
+  songAudio.currentTime = 0;
+  songAudio.volume = 0.9;
+  try {
+    await songAudio.play();
+  } catch (error) {
+    return;
+  }
 }
 
 function renderIntro(progress) {
@@ -423,9 +478,11 @@ function resetTypewriter() {
 
 function enterExplosionState() {
   createPhotoParticles();
+  createBurstParticles();
   state = "explosion";
   targetExplosionProgress = 1;
   resetTypewriter();
+  playBirthdaySong();
 }
 
 function enterTypewriterState() {
@@ -433,6 +490,7 @@ function enterTypewriterState() {
   targetExplosionProgress = 0;
   resetTypewriter();
   startTypewriterIfNeeded();
+  stopBirthdaySong();
 }
 
 async function initCamera() {
@@ -575,6 +633,7 @@ async function init() {
   createBurstParticles();
   paperSignature.classList.remove("visible");
   window.addEventListener("resize", () => {
+    createDecorativeParticles();
     createPhotoParticles();
   });
   await initCamera();
